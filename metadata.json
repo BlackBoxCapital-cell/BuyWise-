@@ -1,0 +1,6 @@
+{
+  "name": "Curated Vault",
+  "description": "An editorial, high-converting affiliate storefront for verified Amazon and Impact.com products.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
