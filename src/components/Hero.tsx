@@ -2,7 +2,11 @@ import React from 'react';
 import { getCurrentDateFormatted } from '../utils/affiliate';
 import { ShieldCheck, Award, Zap, CheckCircle2, TrendingUp, Sparkles } from 'lucide-react';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onOpenAICuratorModal?: () => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onOpenAICuratorModal }) => {
   const currentDate = getCurrentDateFormatted();
 
   return (
@@ -11,10 +15,19 @@ export const Hero: React.FC = () => {
         
         {/* Main Content */}
         <div className="hero-content max-w-3xl space-y-2">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm bg-slate-900 text-white text-[10px] font-bold tracking-wider uppercase">
               VERIFIED INDEX
             </span>
+            {onOpenAICuratorModal && (
+              <button
+                onClick={onOpenAICuratorModal}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 text-[10px] font-bold tracking-tight cursor-pointer transition-colors"
+              >
+                <Sparkles className="w-3 h-3 text-emerald-700" />
+                <span>Try Free AI Concierge</span>
+              </button>
+            )}
             <span className="text-xs text-slate-500 font-medium">
               Independent catalog of top-rated items
             </span>

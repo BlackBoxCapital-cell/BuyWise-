@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product, AffiliateSettings } from '../types';
-import { X, Star, CheckCircle, AlertTriangle, ExternalLink, ShieldCheck, Heart, ThumbsUp, Tag, TrendingDown } from 'lucide-react';
+import { askAIProductInsights } from '../services/aiService';
+import { X, Star, CheckCircle, AlertTriangle, ExternalLink, ShieldCheck, Heart, ThumbsUp, Tag, TrendingDown, Sparkles, Send, Bot } from 'lucide-react';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -18,8 +19,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onToggleSave,
   onTriggerOutboundRedirect,
 }) => {
-  const [activeTab, setActiveTab] = useState<'verdict' | 'specs' | 'price' | 'reviews'>('verdict');
+  const [activeTab, setActiveTab] = useState<'verdict' | 'ai' | 'specs' | 'price' | 'reviews'>('verdict');
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({});
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   if (!product) return null;
 
@@ -30,6 +34,19 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   const toggleVote = (reviewId: string) => {
     setHelpfulVotes(prev => ({ ...prev, [reviewId]: !prev[reviewId] }));
+  };
+
+  const handleAskAI = async (question?: string) => {
+    if (!product) return;
+    setAiLoading(true);
+    try {
+      const result = await askAIProductInsights(product, question || aiQuestion);
+      setAiAnalysis(result);
+    } catch {
+      setAiAnalysis('Unable to generate AI analysis at this time.');
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   return (
@@ -162,10 +179,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Quick Navigation Tabs */}
-              <div className="flex border-b border-slate-200 mb-4 gap-4">
+              <div className="flex border-b border-slate-200 mb-4 gap-4 overflow-x-auto scrollbar-none">
                 <button
                   onClick={() => setActiveTab('verdict')}
-                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
+                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
                     activeTab === 'verdict'
                       ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -174,8 +191,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   Editorial Verdict
                 </button>
                 <button
+                  onClick={() => {
+                    setActiveTab('ai');
+                    if (!aiAnalysis) handleAskAI();
+                  }}
+                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap flex items-center gap-1 ${
+                    activeTab === 'ai'
+                      ? 'border-emerald-600 text-emerald-700'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                  Ask AI Insights
+                </button>
+                <button
                   onClick={() => setActiveTab('specs')}
-                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
+                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
                     activeTab === 'specs'
                       ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -185,7 +216,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab('price')}
-                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
+                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
                     activeTab === 'price'
                       ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -195,7 +226,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab('reviews')}
-                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
+                  className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
                     activeTab === 'reviews'
                       ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -247,6 +278,59 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       </ul>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Tab 2: AI Insights */}
+              {activeTab === 'ai' && (
+                <div className="space-y-3.5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bot className="w-5 h-5 text-emerald-600" />
+                      <h4 className="font-bold text-xs text-slate-900 uppercase tracking-wider">
+                        Gemini AI Product Analyst
+                      </h4>
+                    </div>
+                    <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
+                      Free AI • 3.6 Flash
+                    </span>
+                  </div>
+
+                  {aiLoading ? (
+                    <div className="p-4 bg-white rounded-lg border border-slate-200 text-xs text-slate-600 flex items-center gap-2 animate-pulse">
+                      <Sparkles className="w-4 h-4 text-emerald-600 animate-spin" />
+                      <span>Generating deep AI insights on {product.title}...</span>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 bg-white rounded-lg border border-slate-200 text-xs text-slate-800 leading-relaxed whitespace-pre-wrap">
+                      {aiAnalysis || 'Click below or ask a specific question to analyze this product with Gemini AI.'}
+                    </div>
+                  )}
+
+                  {/* Ask Question Form */}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleAskAI();
+                    }}
+                    className="flex gap-2 pt-1"
+                  >
+                    <input
+                      type="text"
+                      value={aiQuestion}
+                      onChange={(e) => setAiQuestion(e.target.value)}
+                      placeholder="Ask AI: e.g., 'Is this durable?', 'Is it worth the price?'"
+                      className="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-md outline-none focus:border-slate-900"
+                    />
+                    <button
+                      type="submit"
+                      disabled={aiLoading}
+                      className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-md shadow-2xs flex items-center gap-1 cursor-pointer"
+                    >
+                      <Send className="w-3 h-3" />
+                      <span>Ask</span>
+                    </button>
+                  </form>
                 </div>
               )}
 

@@ -19,6 +19,7 @@ import { Newsletter } from './components/Newsletter';
 import { SubmitProductModal } from './components/SubmitProductModal';
 import { LegalModals } from './components/LegalModals';
 import { SavedItemsModal } from './components/SavedItemsModal';
+import { AICuratorModal } from './components/AICuratorModal';
 import { Footer } from './components/Footer';
 import { SearchX, Filter } from 'lucide-react';
 
@@ -77,6 +78,7 @@ export default function App() {
   const [isSavedModalOpen, setIsSavedModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [isAICuratorOpen, setIsAICuratorOpen] = useState(false);
   const [activeLegalTab, setActiveLegalTab] = useState<'ftc' | 'privacy' | 'editorial' | null>(null);
 
   // Toggle Save Item
@@ -164,11 +166,12 @@ export default function App() {
         onOpenSavedModal={() => setIsSavedModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
         onOpenSubmitModal={() => setIsSubmitModalOpen(true)}
+        onOpenAICuratorModal={() => setIsAICuratorOpen(true)}
         hasCustomTags={Boolean(affiliateSettings.amazonTag || affiliateSettings.impactId)}
       />
 
       {/* 3. Hero Section (Authority & Social Proof) */}
-      <Hero />
+      <Hero onOpenAICuratorModal={() => setIsAICuratorOpen(true)} />
 
       {/* 4. Filter Bar */}
       <FilterBar
@@ -327,6 +330,15 @@ export default function App() {
       <SubmitProductModal
         isOpen={isSubmitModalOpen}
         onClose={() => setIsSubmitModalOpen(false)}
+      />
+
+      {/* Free AI Curator Modal */}
+      <AICuratorModal
+        isOpen={isAICuratorOpen}
+        onClose={() => setIsAICuratorOpen(false)}
+        products={products}
+        onOpenQuickView={(p) => setActiveProductForDetail(p)}
+        onTriggerOutboundRedirect={(p) => setActiveProductForRedirect(p)}
       />
 
       {/* Legal & Compliance Modals */}

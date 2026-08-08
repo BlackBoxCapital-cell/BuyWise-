@@ -8,6 +8,7 @@ interface HeaderProps {
   onOpenSavedModal: () => void;
   onOpenSettingsModal: () => void;
   onOpenSubmitModal: () => void;
+  onOpenAICuratorModal: () => void;
   hasCustomTags: boolean;
 }
 
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSavedModal,
   onOpenSettingsModal,
   onOpenSubmitModal,
+  onOpenAICuratorModal,
   hasCustomTags,
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +95,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Action Header Items */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Free AI Curator Button */}
+            <button
+              onClick={onOpenAICuratorModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-emerald-600 rounded-lg transition-colors border border-slate-800 shadow-2xs cursor-pointer group"
+              title="Open Free AI Shopping Concierge"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white transition-colors animate-pulse" />
+              <span>AI Curator</span>
+              <span className="hidden md:inline-block text-[9px] font-mono bg-emerald-500/20 text-emerald-300 group-hover:bg-white/20 group-hover:text-white px-1 rounded">Free</span>
+            </button>
+
             {/* Submit Product Modal Toggle */}
             <button
               onClick={onOpenSubmitModal}

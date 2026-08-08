@@ -141,8 +141,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Key Feature Highlights Badges */}
-          <div className="flex flex-wrap gap-1 mb-3">
-            {product.highlights.slice(0, 3).map((hl, i) => (
+          <div className="flex flex-wrap gap-1 mb-3 items-center">
+            {product.highlights.slice(0, 2).map((hl, i) => (
               <span
                 key={i}
                 className="text-[9px] font-medium bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200/60"
@@ -150,6 +150,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 {hl}
               </span>
             ))}
+            <button
+              onClick={() => onOpenQuickView(product)}
+              className="text-[9px] font-bold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200 transition-colors flex items-center gap-0.5 cursor-pointer ml-auto"
+              title="View Gemini AI analysis"
+            >
+              <span>AI Insights</span>
+            </button>
           </div>
 
         </div>
